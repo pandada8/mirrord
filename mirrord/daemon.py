@@ -6,7 +6,6 @@ import argparse
 import argparse
 import sys
 
-
 class Application():
     def __init__(self):
         self.tasks = {}
