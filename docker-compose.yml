@@ -3,5 +3,6 @@ services:
   mirrord:
     build: .
     volumes:
-      - /home/mirrors:/home/mirrors
+      - /home/mirror:/home/mirror
       - ./conf/config.yml:/app/config.yml
+      - ./mirrord:/app/mirrord
