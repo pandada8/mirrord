@@ -51,7 +51,7 @@ class RsyncTask(Task):
         self.interval = parse_interval(config.get("interval", "12h"))
         self.process = None
         self.last_run = datetime.now() - self.interval
-        self.cmd = " ".join command + [self.target, self.source]
+        self.cmd = " ".join(command + [self.target, self.source])
         self.logger = logging.getLogger("task:{}".format(name))
     def __str__(self):
         return "[RsyncTask {}]".format(self.name)
