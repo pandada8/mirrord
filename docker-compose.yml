@@ -4,3 +4,4 @@ services:
     build: .
     volumes:
       - /home/mirrors:/home/mirrors
+      - ./conf/config.yml:/app/config.yml
