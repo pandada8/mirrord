@@ -1,0 +1,6 @@
+version: "2"
+services:
+  mirrord:
+    build: .
+    volumes:
+      - /home/mirrors:/home/mirrors
