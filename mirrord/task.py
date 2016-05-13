@@ -3,7 +3,9 @@ import re
 import asyncio.subprocess
 import logging
 from datetime import timedelta, datetime
-import shlex
+
+re_num = re.compile(r"[\.\d\,]+")
+
 
 def find_line(text, start):
     for i in text.split("\n"):
@@ -12,7 +14,7 @@ def find_line(text, start):
     else:
         return ""
 
-re_num = re.compile(r"[\.\d\,]+")
+
 def first_num(text):
     found = re_num.search(text)
     if found:
@@ -22,6 +24,7 @@ def first_num(text):
         else:
             return int(num)
 
+
 def parse_interval(s):
     if s.endswith("d"):
         return timedelta(days=int(s[:-1]))
@@ -30,7 +33,9 @@ def parse_interval(s):
     elif s.endswith("m"):
         return timedelta(minutes=int(s[:-1]))
 
+
 class Task():
+
     def __init__(self):
         pass
 
@@ -40,8 +45,12 @@ class Task():
     def start(self):
         pass
 
+
 class RsyncTask(Task):
-    command = ["rsync", "--no-motd", "--recursive", "--times", "--links", "--hard-links", "--verbose", "--delete", "--stats", "--whole-file"]
+
+    command = ["rsync", "--no-motd", "--recursive", "--times", "--links",
+               "--hard-links", "--verbose", "--delete", "--stats",
+               "--whole-file"]
     re_stats = re.compile(r"Number\sof\sfiles[\s\S]+speedup is [.\d]+")
 
     def __init__(self, name, config):
@@ -53,14 +62,16 @@ class RsyncTask(Task):
         self.last_run = datetime.now() - self.interval
         self.cmd = " ".join(self.command + [self.source, self.target])
         self.logger = logging.getLogger("task:{}".format(name))
+
     def __str__(self):
         return "[RsyncTask {}]".format(self.name)
 
     def can_run(self):
         if self.process:
-            return self.process.returncode != None and self.last_run + self.interval < datetime.now()
+            return self.process.returncode is not None and self.last_run + self.interval < datetime.now()
         else:
             return True
+
     def parse_stats(self, text):
         stats = self.re_stats.search(text)
         if not stats:
@@ -84,10 +95,11 @@ class RsyncTask(Task):
 
     async def run(self):
         self.buffer = b''
-        self.process = await asyncio.create_subprocess_shell(self.cmd, stdout=asyncio.subprocess.PIPE)
+        self.process = await asyncio.create_subprocess_shell(self.cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
         self.logger.info("Started %s", self.name)
         self.logger.info(self.cmd)
-        while self.process.returncode == None and not self.process.stdout.at_eof():
+
+        while self.process.returncode is None and not self.process.stdout.at_eof():
             line = await self.process.stdout.readline()
             self.buffer += line
             # print(line)
@@ -95,7 +107,7 @@ class RsyncTask(Task):
         self.logger.info("Finisheded %s, returncode %s", self.name, self.process.returncode)
         try:
             stats = self.parse_stats(self.buffer.decode("utf8"))
-            # print(stats)
+            print(stats)
             # self.save_stats(stats)
         except Exception as e:
             self.logger.exception(e)

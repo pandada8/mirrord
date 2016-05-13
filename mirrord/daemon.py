@@ -3,8 +3,7 @@ from task import RsyncTask
 import asyncio
 import logging
 import argparse
-import argparse
-import sys
+
 
 class Application():
     def __init__(self):
@@ -13,10 +12,9 @@ class Application():
     def load_config(self, config):
         with open(config) as fp:
             data = yaml.safe_load(fp)
-            for i,j in data["task"].items():
+            for i, j in data["task"].items():
                 self.tasks[i] = RsyncTask(i, j)
         logging.info("loaded config")
-            # self.db =
 
     def find_to_update(self):
         for i in self.tasks.values():
