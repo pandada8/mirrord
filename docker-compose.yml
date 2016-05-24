@@ -7,3 +7,4 @@ services:
       - ./conf/config.yml:/app/config.yml
       - ./mirrord:/app/mirrord
       - ./log:/app/log.log
+    network_mode: host

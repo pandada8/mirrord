@@ -50,7 +50,7 @@ class RsyncTask(Task):
 
     command = ["rsync", "--no-motd", "--recursive", "--times", "--links",
                "--hard-links", "--verbose", "--delete", "--stats",
-               "--whole-file"]
+               "--whole-file", "--exclude=.~tmp~", "--delete-excluded"]
     re_stats = re.compile(r"Number\sof\sfiles[\s\S]+speedup is [.\d]+")
 
     def __init__(self, name, config):
@@ -60,7 +60,7 @@ class RsyncTask(Task):
         self.interval = parse_interval(config.get("interval", "12h"))
         self.process = None
         self.last_run = datetime.now() - self.interval
-        self.cmd = " ".join(self.command + [self.source, self.target])
+        self.cmd = " ".join(self.command + [config.get("flags", ""), self.source, self.target])
         self.logger = logging.getLogger("task:{}".format(name))
 
     def __str__(self):
@@ -103,7 +103,7 @@ class RsyncTask(Task):
             line = await self.process.stdout.readline()
             self.buffer += line
             # print(line)
-            logging.info(line.decode("utf8").rstrip("\n"))
+            self.logger.info(line.decode("utf8").rstrip("\n"))
         self.logger.info("Finisheded %s, returncode %s", self.name, self.process.returncode)
         try:
             stats = self.parse_stats(self.buffer.decode("utf8"))
