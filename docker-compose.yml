@@ -6,3 +6,4 @@ services:
       - /home/mirror:/home/mirror
       - ./conf/config.yml:/app/config.yml
       - ./mirrord:/app/mirrord
+      - ./log:/app/log.log
