@@ -103,7 +103,7 @@ class RsyncTask(Task):
             line = await self.process.stdout.readline()
             self.buffer += line
             # print(line)
-            self.logger.info(line.decode("utf8").rstrip("\n"))
+            # self.logger.info(line.decode("utf8").rstrip("\n"))
         self.logger.info("Finisheded %s, returncode %s", self.name, self.process.returncode)
         try:
             stats = self.parse_stats(self.buffer.decode("utf8"))
