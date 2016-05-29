@@ -59,6 +59,7 @@ class RsyncTask(Task):
         self.source = config['source']
         self.interval = parse_interval(config.get("interval", "12h"))
         self.process = None
+        self.config = config
         self.last_run = datetime.now() - self.interval
         self.cmd = " ".join(self.command + [config.get("flags", ""), self.source, self.target])
         self.logger = logging.getLogger("task:{}".format(name))
@@ -95,7 +96,8 @@ class RsyncTask(Task):
 
     async def run(self):
         self.buffer = b''
-        self.process = await asyncio.create_subprocess_shell(self.cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+        env = {"RSYNC_PASSWORD": self.config.get("password")} if "password" in self.config else None
+        self.process = await asyncio.create_subprocess_shell(self.cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT, env=env)
         self.logger.info("Started %s", self.name)
         self.logger.info(self.cmd)
 
